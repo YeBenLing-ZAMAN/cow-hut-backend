@@ -88,7 +88,7 @@ const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
 }
 
 const getAllOrders = async (): Promise<IGenericResponse<IOrder[]>> => {
-  const result = await Order.find().sort()
+  const result = await Order.find().sort().populate('cow buyer')
   const total = await Order.countDocuments()
   return {
     meta: {
