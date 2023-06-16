@@ -9,5 +9,12 @@ router.post(
   requestValidation.validateRequest(UserValidation.createUserZodSchema),
   UserController.createUser
 )
-
+router.get('/', UserController.getAllUsers)
+router.get('/:id', UserController.getSingleUser)
+router.delete('/:id', UserController.deleteUser)
+router.patch(
+  '/:id',
+  requestValidation.validateRequest(UserValidation.updateUserZodSchema),
+  UserController.updateUser
+)
 export const UserRoutes = router

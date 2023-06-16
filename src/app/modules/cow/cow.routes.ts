@@ -10,4 +10,13 @@ router.post(
   CowController.createCow
 )
 
+router.get('/', CowController.getAllCows)
+router.get('/:id', CowController.getSingleCow)
+router.delete('/:id', CowController.deleteCow)
+router.patch(
+  '/:id',
+  requestValidation.validateRequest(CowValidation.updateCowZodSchema),
+  CowController.updateCow
+)
+
 export const CowRoutes = router
