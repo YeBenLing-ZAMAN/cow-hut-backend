@@ -5,6 +5,8 @@ import { IGenericErrorMessage } from '../../interface/error'
 import handleValidationError from '../../errors/handleValidationError'
 import handleCastError from '../../errors/handleCastError'
 import ApiError from '../../errors/ApiError'
+import { ZodError } from 'zod'
+import handleZodError from '../../errors/handleZodError'
 
 const globalErrorHandler: ErrorRequestHandler = (
   error,
@@ -27,6 +29,11 @@ const globalErrorHandler: ErrorRequestHandler = (
     errorMessages = simplifiedError.errorMessages
   } else if (error?.name === 'CastError') {
     const simplifiedError = handleCastError(error)
+    statusCode = simplifiedError.statusCode
+    message = simplifiedError.message
+    errorMessages = simplifiedError.errorMessages
+  } else if (error instanceof ZodError) {
+    const simplifiedError = handleZodError(error)
     statusCode = simplifiedError.statusCode
     message = simplifiedError.message
     errorMessages = simplifiedError.errorMessages
