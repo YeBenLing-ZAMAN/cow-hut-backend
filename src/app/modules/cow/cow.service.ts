@@ -13,7 +13,7 @@ const createCow = async (payload: ICow): Promise<ICow | null> => {
 }
 
 const getAllCows = async (): Promise<IGenericResponse<ICow[]>> => {
-  const result = await Cow.find().sort()
+  const result = await Cow.find().sort().populate('seller')
   const total = await Cow.countDocuments()
   return {
     meta: {

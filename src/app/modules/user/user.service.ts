@@ -5,6 +5,7 @@ import { User } from './user.model'
 import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
 import { IGenericResponse } from '../../../interface/error'
+import { Cow } from '../cow/cow.model'
 
 const createUser = async (user: IUser): Promise<IUser | null> => {
   let newUserData = null
@@ -76,32 +77,24 @@ const updateUser = async (
 }
 
 const deleteUser = async (id: string): Promise<IUser | null> => {
-  let deletedCow = null
+  let deleteUser = null
   const session = await mongoose.startSession()
   try {
     session.startTransaction()
 
-    const isExist = await User.findOne({ id })
+    const isExist = await User.findById(id)
     if (!isExist) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found! Please')
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
     }
 
-    // const newStudent = await Student.create([student], { session });
-    const deleteUser = await User.findOneAndDelete({ id }, { session })
-
-    if (!deleteUser) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to delete user')
-    }
-
-    //set student -->  _id into user.student
-    // user.student = newStudent[0]._id;
-
-    deletedCow = await User.findOneAndDelete(
-      { seller: id },
-      { session }
-    ).populate('seller')
+    const deletedCow = await Cow.deleteMany({ seller: id }, { session })
     if (!deletedCow) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to delete cows')
+    }
+
+    deleteUser = await User.findByIdAndDelete(id, { session })
+    if (!deleteUser) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to delete user')
     }
 
     await session.commitTransaction()
@@ -112,7 +105,7 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
     throw error
   }
 
-  return deletedCow
+  return deleteUser
 }
 
 export const UserService = {
