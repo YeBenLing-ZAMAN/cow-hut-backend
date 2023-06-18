@@ -29,3 +29,10 @@ export type ICow = {
 }
 
 export type CowModel = Model<ICow, Record<string, unknown>>
+
+export type ICowFilters = {
+  searchTeam?: string
+  minPrice?: number
+  maxPrice?: number
+  location?: string
+}

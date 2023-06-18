@@ -1,8 +1,12 @@
-import { ICow } from './cow.interface'
+import { ICow, ICowFilters } from './cow.interface'
 import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
 import { Cow } from './cow.model'
 import { IGenericResponse } from '../../../interface/error'
+import { IPaginationOptions } from '../../../interface/pagination'
+import { CowSearchAbleFields } from './cow.constants'
+import { paginationHelper } from '../../../helpers/paginationHelpers'
+import { SortOrder } from 'mongoose'
 
 const createCow = async (payload: ICow): Promise<ICow | null> => {
   const result = await Cow.create(payload)
@@ -12,13 +16,66 @@ const createCow = async (payload: ICow): Promise<ICow | null> => {
   return result
 }
 
-const getAllCows = async (): Promise<IGenericResponse<ICow[]>> => {
-  const result = await Cow.find().sort().populate('seller')
-  const total = await Cow.countDocuments()
+const getAllCows = async (
+  filters: ICowFilters,
+  paginationOptions: IPaginationOptions
+): Promise<IGenericResponse<ICow[]>> => {
+  const { searchTeam, ...filtersData } = filters
+
+  const andConditions = []
+
+  if (searchTeam) {
+    andConditions.push({
+      $or: CowSearchAbleFields.map(field => ({
+        [field]: {
+          $regex: searchTeam,
+          $options: 'i',
+        },
+      })),
+    })
+  }
+
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        if (field === 'minPrice') {
+          return {
+            price: { $gte: parseInt(value as string) },
+          }
+        }
+        if (field === 'maxPrice') {
+          return {
+            price: { $lte: parseInt(value as string) },
+          }
+        }
+        return {
+          [field]: value,
+        }
+      }),
+    })
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelper.calculatePagination(paginationOptions)
+
+  const sortCondition: { [key: string]: SortOrder } = {}
+  if (sortBy && sortOrder) {
+    sortCondition[sortBy] = sortOrder
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {}
+
+  const result = await Cow.find(whereConditions)
+    .populate('seller')
+    .sort(sortCondition)
+    .skip(skip)
+    .limit(limit)
+  const total = await Cow.countDocuments(whereConditions)
   return {
     meta: {
-      page: 1,
-      limit: 2,
+      page,
+      limit,
       total,
     },
     data: result,

@@ -45,7 +45,10 @@ const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
     }
     const sellerInfo = await User.findById(cowDetails.seller).session(session)
     if (!sellerInfo) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to seller information')
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Failed to find seller information'
+      )
     }
 
     const SellerUpdate = await User.findOneAndUpdate(

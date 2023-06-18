@@ -4,6 +4,9 @@ import sendResponse from '../../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { CowService } from './cow.service'
 import { ICow } from './cow.interface'
+import pick from '../../../shared/pick'
+import { CowFilterAbleFields } from './cow.constants'
+import { paginationFields } from '../../constants/pagination'
 
 const createCow = catchAsync(async (req: Request, res: Response) => {
   const { ...cow } = req.body
@@ -17,7 +20,10 @@ const createCow = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllCows = catchAsync(async (req: Request, res: Response) => {
-  const result = await CowService.getAllCows()
+  const filters = pick(req.query, CowFilterAbleFields)
+  const paginationOptions = pick(req.query, paginationFields)
+  // console.log(filters, paginationOptions)
+  const result = await CowService.getAllCows(filters, paginationOptions)
 
   sendResponse<ICow[]>(res, {
     statusCode: httpStatus.OK,
