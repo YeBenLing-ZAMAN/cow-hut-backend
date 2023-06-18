@@ -5,9 +5,9 @@ import { OrderRoutes } from '../modules/order/order.routes'
 const router = express.Router()
 
 const moduleRoutes = [
-  { path: '/user', route: UserRoutes },
-  { path: '/cow', route: CowRoutes },
-  { path: '/order', route: OrderRoutes },
+  { path: '/users', route: UserRoutes },
+  { path: '/cows', route: CowRoutes },
+  { path: '/orders', route: OrderRoutes },
 ]
 
 moduleRoutes.forEach(route => router.use(route.path, route.route))
