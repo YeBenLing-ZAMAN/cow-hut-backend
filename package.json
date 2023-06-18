@@ -1,7 +1,9 @@
 {
   "name": "cow-hut-backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "engines": {
+    "node": ">=16"
+  },
   "author": "zaman",
   "license": "MIT",
   "scripts": {
