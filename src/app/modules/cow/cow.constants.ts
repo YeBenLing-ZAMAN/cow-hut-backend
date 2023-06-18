@@ -22,7 +22,7 @@ export const category = ['Dairy', 'Beef', 'DualPurpose']
 
 export const CowSearchAbleFields = ['name', 'breed', 'category', 'location']
 export const CowFilterAbleFields = [
-  'searchTeam',
+  'searchTerm',
   'minPrice',
   'maxPrice',
   'location',

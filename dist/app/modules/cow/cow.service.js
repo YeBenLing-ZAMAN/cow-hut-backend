@@ -74,14 +74,14 @@ const createCow = payload =>
   })
 const getAllCows = (filters, paginationOptions) =>
   __awaiter(void 0, void 0, void 0, function* () {
-    const { searchTeam } = filters,
-      filtersData = __rest(filters, ['searchTeam'])
+    const { searchTerm } = filters,
+      filtersData = __rest(filters, ['searchTerm'])
     const andConditions = []
-    if (searchTeam) {
+    if (searchTerm) {
       andConditions.push({
         $or: cow_constants_1.CowSearchAbleFields.map(field => ({
           [field]: {
-            $regex: searchTeam,
+            $regex: searchTerm,
             $options: 'i',
           },
         })),

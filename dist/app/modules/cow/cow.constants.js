@@ -36,4 +36,4 @@ exports.CowSearchAbleFields = [
   // 'price',
   // 'weight',
 ]
-exports.CowFilterAbleFields = ['searchTeam', 'minPrice', 'maxPrice', 'location']
+exports.CowFilterAbleFields = ['searchTerm', 'minPrice', 'maxPrice', 'location']

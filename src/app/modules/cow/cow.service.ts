@@ -20,15 +20,15 @@ const getAllCows = async (
   filters: ICowFilters,
   paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<ICow[]>> => {
-  const { searchTeam, ...filtersData } = filters
+  const { searchTerm, ...filtersData } = filters
 
   const andConditions = []
 
-  if (searchTeam) {
+  if (searchTerm) {
     andConditions.push({
       $or: CowSearchAbleFields.map(field => ({
         [field]: {
-          $regex: searchTeam,
+          $regex: searchTerm,
           $options: 'i',
         },
       })),
