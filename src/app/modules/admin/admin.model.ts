@@ -33,4 +33,22 @@ AdminSchema.pre('save', async function (next) {
   next()
 })
 
+AdminSchema.methods.isAdminExist = async function (
+  phoneNumber: string
+): Promise<Partial<IAdmin> | null> {
+  const admin = await Admin.findOne(
+    { phoneNumber },
+    { id: 1, password: 1, role: 1 }
+  ).lean()
+  return admin
+}
+
+AdminSchema.methods.isPasswordMatch = async function (
+  givenPassword: string,
+  savedPassword: string
+): Promise<boolean> {
+  const isMatched = await bcrypt.compare(givenPassword, savedPassword)
+  return isMatched
+}
+
 export const Admin = model<IAdmin, AdminModel>('Admin', AdminSchema)

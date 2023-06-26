@@ -6,6 +6,7 @@ export type UserName = {
 }
 
 export type IAdmin = {
+  _id: string
   phoneNumber: string
   role: string
   name: UserName //embedded object
@@ -13,4 +14,22 @@ export type IAdmin = {
   address: string
 }
 
-export type AdminModel = Model<IAdmin, Record<string, unknown>>
+export type IAdminMethods = {
+  isAdminExist(id: string): Promise<Partial<IAdmin> | null>
+  isPasswordMatch(
+    givenPassword: string,
+    savedPassword: string
+  ): Promise<boolean>
+}
+
+export type AdminModel = Model<IAdmin, Record<string, unknown>, IAdminMethods>
+
+export type IAdminLogin = {
+  phoneNumber: string
+  password: string
+}
+
+export type IAdminLoginResponse = {
+  accessToken: string
+  refreshToken?: string
+}

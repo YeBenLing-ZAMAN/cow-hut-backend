@@ -10,5 +10,10 @@ router.post(
   requestValidation.validateRequest(AdminValidation.createAdminZodSchema),
   AdminController.createAdmin
 )
+router.post(
+  '/login',
+  requestValidation.validateRequest(AdminValidation.loginAdminZodSchema),
+  AdminController.adminLogin
+)
 
 export const AdminRoutes = router
