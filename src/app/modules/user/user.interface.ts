@@ -6,7 +6,7 @@ export type UserName = {
 }
 
 export type IUser = {
-  role: 'seller' | 'buyer'
+  role: 'seller' | 'buyer' | 'admin'
   phoneNumber: string
   password: string
   name: UserName
