@@ -17,7 +17,8 @@ const createOrders = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.getAllOrders()
+  const { ...requestedUser } = req.user
+  const result = await OrderService.getAllOrders(requestedUser)
 
   sendResponse<IOrder[]>(res, {
     statusCode: httpStatus.OK,

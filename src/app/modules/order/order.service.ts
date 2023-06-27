@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
 import { IGenericResponse } from '../../../interface/error'
@@ -6,6 +7,7 @@ import { Order } from './order.model'
 import { User } from '../user/user.model'
 import { Cow } from '../cow/cow.model'
 import mongoose from 'mongoose'
+import { ObjectId } from 'mongodb'
 
 const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
   let newOrderData = null
@@ -90,16 +92,63 @@ const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
   return newOrderData
 }
 
-const getAllOrders = async (): Promise<IGenericResponse<IOrder[]>> => {
-  const result = await Order.find().sort().populate('cow buyer')
+const getAllOrders = async (
+  requestedUser: any
+): Promise<IGenericResponse<IOrder[]>> => {
+  const result = await Order.find()
+    .sort()
+    .populate({
+      path: 'cow',
+      populate: {
+        path: 'seller',
+        select: '-password',
+      },
+    })
+    .populate({
+      path: 'buyer',
+      select: '-password',
+    })
   const total = await Order.countDocuments()
-  return {
-    meta: {
-      page: 1,
-      limit: 2,
-      total,
-    },
-    data: result,
+  if (requestedUser.role === 'admin') {
+    return {
+      meta: {
+        page: 1,
+        limit: 2,
+        total,
+      },
+      data: result,
+    }
+  } else if (requestedUser.role === 'buyer') {
+    const specificBuyerOrder = result.filter(
+      item => item.buyer.id === requestedUser._id
+    )
+    const total = await specificBuyerOrder.length
+    return {
+      meta: {
+        page: 1,
+        limit: 2,
+        total,
+      },
+      data: specificBuyerOrder,
+    }
+  } else {
+    // const specificSellerForOrder = result.filter(
+    //   item =>
+    //     // item.cow.seller.equals(sellerId)
+    //     item.cow.seller === sellerId
+    // )
+    const specificSellerForOrder = result.filter(
+      item => item.cow.seller.id === requestedUser._id
+    )
+    const total = await specificSellerForOrder.length
+    return {
+      meta: {
+        page: 1,
+        limit: 2,
+        total,
+      },
+      data: specificSellerForOrder,
+    }
   }
 }
 
