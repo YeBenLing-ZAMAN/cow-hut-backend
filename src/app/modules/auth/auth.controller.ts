@@ -20,7 +20,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
   sendResponse<ILoginUserResponse>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'user login successfully!',
+    message: 'User logged in successfully!',
     data: others,
   })
 })
@@ -38,7 +38,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   sendResponse<IRefreshTokenResponse>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'user login successfully!',
+    message: 'New access token generated successfully !',
     data: result,
   })
 })
