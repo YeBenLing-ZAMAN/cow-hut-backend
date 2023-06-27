@@ -12,10 +12,11 @@ router.post(
   UserController.createUser
 )
 router.get('/', auth(ENUM_USER_ROLE.ADMIN), UserController.getAllUsers)
-router.get('/:id', UserController.getSingleUser)
-router.delete('/:id', UserController.deleteUser)
+router.get('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.getSingleUser)
+router.delete('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.deleteUser)
 router.patch(
   '/:id',
+  auth(ENUM_USER_ROLE.ADMIN),
   requestValidation.validateRequest(UserValidation.updateUserZodSchema),
   UserController.updateUser
 )
