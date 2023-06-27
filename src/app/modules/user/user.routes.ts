@@ -20,4 +20,16 @@ router.patch(
   requestValidation.validateRequest(UserValidation.updateUserZodSchema),
   UserController.updateUser
 )
+router.get(
+  '/my-profile',
+  auth(ENUM_USER_ROLE.ADMIN),
+  UserController.getMyProfile
+)
+
+router.patch(
+  '/my-profile',
+  auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.SELLER),
+  UserController.updateMyProfile
+)
+
 export const UserRoutes = router

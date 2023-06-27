@@ -63,11 +63,36 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   })
 })
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const { ...requestedUser } = req.user
+  const result = await UserService.getMyProfile(requestedUser)
 
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User retrieved successfully !',
+    data: result,
+  })
+})
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const { ...requestedUser } = req.user
+  const updatedData = req.body
+  const result = await UserService.updateMyProfile(requestedUser, updatedData)
+
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User updated successfully !',
+    data: result,
+  })
+})
 export const UserController = {
   createUser,
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
+  getMyProfile,
+  updateMyProfile,
 }

@@ -110,10 +110,48 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   return deleteUser
 }
 
+const getMyProfile = async (requestedUser: any): Promise<IUser | null> => {
+  const result = await User.findById(requestedUser._id)
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
+  }
+  return result
+}
+
+const updateMyProfile = async (
+  requestedUser: any,
+  payload: Partial<IUser>
+): Promise<IUser | null> => {
+  const isExist = await User.findById(requestedUser._id)
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
+  }
+
+  const { name, ...userData } = payload
+  const updatedStudentData: Partial<IUser> = { ...userData }
+  if (name && Object.keys(name).length > 0) {
+    Object.keys(name).forEach(key => {
+      const nameKey = `name.${key}` as keyof Partial<IUser>
+      ;(updatedStudentData as any)[nameKey] = name[key as keyof typeof name]
+    })
+  }
+  const result = await User.findByIdAndUpdate(
+    requestedUser._id,
+    updatedStudentData,
+    {
+      new: true, // return new document of the DB
+    }
+  )
+  return result
+}
+
 export const UserService = {
   createUser,
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
+  getMyProfile,
+  updateMyProfile,
 }
