@@ -6,6 +6,7 @@ export type UserName = {
 }
 
 export type IUser = {
+  _id: string
   role: 'seller' | 'buyer' | 'admin'
   phoneNumber: string
   password: string
@@ -16,4 +17,13 @@ export type IUser = {
   income: number
 }
 
-export type UserModel = Model<IUser, Record<string, unknown>>
+export type IUserMethods = {
+  isUserExist(phoneNumber: string): Promise<Partial<IUser> | null>
+  isUserExistByID(id: string): Promise<Partial<IUser> | null>
+  isPasswordMatch(
+    givenPassword: string,
+    savedPassword: string
+  ): Promise<boolean>
+}
+
+export type UserModel = Model<IUser, Record<string, unknown>, IUserMethods>

@@ -25,7 +25,9 @@ const createUser = async (user: IUser): Promise<IUser | null> => {
     throw error
   }
   if (newUserData) {
-    newUserData = await User.findOne({ _id: newUserData._id })
+    newUserData = await User.findOne({ _id: newUserData._id }).select({
+      password: 0,
+    })
   }
 
   return newUserData
