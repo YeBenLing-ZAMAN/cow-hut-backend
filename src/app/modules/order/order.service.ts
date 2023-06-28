@@ -152,7 +152,29 @@ const getAllOrders = async (
   }
 }
 
+const getOrder = async (id: string): Promise<IOrder | null> => {
+  const result = await Order.findById(id)
+    .sort()
+    .populate({
+      path: 'cow',
+      populate: {
+        path: 'seller',
+        select: '-password',
+      },
+    })
+    .populate({
+      path: 'buyer',
+      select: '-password',
+    })
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Order not found!')
+  }
+  return result
+}
+
 export const OrderService = {
   createOrder,
   getAllOrders,
+  getOrder,
 }
