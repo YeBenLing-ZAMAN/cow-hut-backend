@@ -117,7 +117,48 @@ const getAllOrders = (requestedUser) => __awaiter(void 0, void 0, void 0, functi
         //     // item.cow.seller.equals(sellerId)
         //     item.cow.seller === sellerId
         // )
-        const specificSellerForOrder = result.filter(item => { var _a; return ((_a = item.cow) === null || _a === void 0 ? void 0 : _a.seller.id) === requestedUser._id; });
+        /*
+        const specificSellerForOrder = result.filter(
+          item => item.cow.seller === requestedUser._id
+        ) */
+        const objectId = new mongoose_1.default.Types.ObjectId(requestedUser._id);
+        const specificSellerForOrder = yield order_model_1.Order.aggregate([
+            {
+                $match: {},
+            },
+            {
+                $lookup: {
+                    from: 'cows',
+                    localField: 'cow',
+                    foreignField: '_id',
+                    as: 'cowInfo',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'buyer',
+                    foreignField: '_id',
+                    as: 'buyerInfo',
+                },
+            },
+            {
+                $unwind: '$buyerInfo',
+            },
+            {
+                $unwind: '$cowInfo',
+            },
+            {
+                $match: { 'cowInfo.seller': objectId },
+            },
+            {
+                $project: {
+                    buyerInfo: {
+                        password: 0,
+                    },
+                },
+            },
+        ]);
         const total = yield specificSellerForOrder.length;
         return {
             meta: {
