@@ -6,6 +6,8 @@ import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
 import { IGenericResponse } from '../../../interface/error'
 import { Cow } from '../cow/cow.model'
+import config from '../../../config'
+import bcrypt from 'bcrypt'
 
 const createUser = async (user: IUser): Promise<IUser | null> => {
   let newUserData = null
@@ -111,7 +113,7 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
 }
 
 const getMyProfile = async (requestedUser: any): Promise<IUser | null> => {
-  const result = await User.findById(requestedUser._id)
+  const result = await User.findById(requestedUser._id).select('-password')
 
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
@@ -128,7 +130,7 @@ const updateMyProfile = async (
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
   }
 
-  const { name, ...userData } = payload
+  const { name, password, ...userData } = payload
   const updatedStudentData: Partial<IUser> = { ...userData }
   if (name && Object.keys(name).length > 0) {
     Object.keys(name).forEach(key => {
@@ -136,13 +138,22 @@ const updateMyProfile = async (
       ;(updatedStudentData as any)[nameKey] = name[key as keyof typeof name]
     })
   }
+
+  if (password) {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      Number(config.bcrypt_salt_rounds)
+    )
+    updatedStudentData.password = hashedPassword
+  }
+
   const result = await User.findByIdAndUpdate(
     requestedUser._id,
     updatedStudentData,
     {
       new: true, // return new document of the DB
     }
-  )
+  ).select('-password')
   return result
 }
 

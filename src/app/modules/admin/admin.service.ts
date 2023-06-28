@@ -8,6 +8,7 @@ import { Admin } from './admin.model'
 import { jwtHelpers } from '../../../helpers/jwtHelper'
 import { Secret } from 'jsonwebtoken'
 import config from '../../../config'
+import bcrypt from 'bcrypt'
 
 const createAdmin = async (admin: IAdmin): Promise<IAdmin | null> => {
   let newAdminData = null
@@ -83,7 +84,54 @@ const adminLogin = async (
   }
 }
 
+const getAdminProfile = async (requestedUser: any): Promise<IAdmin | null> => {
+  const result = await Admin.findById(requestedUser._id).select('-password')
+
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
+  }
+  return result
+}
+
+const updateAdminProfile = async (
+  requestedUser: any,
+  payload: Partial<IAdmin>
+): Promise<IAdmin | null> => {
+  const isExist = await Admin.findById(requestedUser._id)
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found!')
+  }
+
+  const { name, password, ...userData } = payload
+  const updatedStudentData: Partial<IAdmin> = { ...userData }
+  if (name && Object.keys(name).length > 0) {
+    Object.keys(name).forEach(key => {
+      const nameKey = `name.${key}` as keyof Partial<IAdmin>
+      ;(updatedStudentData as any)[nameKey] = name[key as keyof typeof name]
+    })
+  }
+
+  if (password) {
+    const hashedPassword = await bcrypt.hash(
+      password,
+      Number(config.bcrypt_salt_rounds)
+    )
+    updatedStudentData.password = hashedPassword
+  }
+
+  const result = await Admin.findByIdAndUpdate(
+    requestedUser._id,
+    updatedStudentData,
+    {
+      new: true, // return new document of the DB
+    }
+  ).select('-password')
+  return result
+}
+
 export const AdminService = {
   createAdmin,
   adminLogin,
+  getAdminProfile,
+  updateAdminProfile,
 }

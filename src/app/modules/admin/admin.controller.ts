@@ -4,7 +4,7 @@ import sendResponse from '../../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { AdminService } from './admin.service'
 import config from '../../../config'
-import { IAdminLoginResponse } from './admin.interface'
+import { IAdmin, IAdminLoginResponse } from './admin.interface'
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const { ...admin } = req.body
@@ -36,7 +36,37 @@ const adminLogin = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getAdminProfile = catchAsync(async (req: Request, res: Response) => {
+  const { ...requestedUser } = req.user
+  const result = await AdminService.getAdminProfile(requestedUser)
+
+  sendResponse<IAdmin>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User retrieved successfully !',
+    data: result,
+  })
+})
+
+const updateAdminProfile = catchAsync(async (req: Request, res: Response) => {
+  const { ...requestedUser } = req.user
+  const updatedData = req.body
+  const result = await AdminService.updateAdminProfile(
+    requestedUser,
+    updatedData
+  )
+
+  sendResponse<IAdmin>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User updated successfully !',
+    data: result,
+  })
+})
+
 export const AdminController = {
   createAdmin,
   adminLogin,
+  getAdminProfile,
+  updateAdminProfile,
 }
