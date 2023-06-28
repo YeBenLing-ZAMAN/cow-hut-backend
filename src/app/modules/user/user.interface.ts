@@ -8,7 +8,7 @@ export type UserName = {
 export type IUser = {
   id: string
   _id: string
-  role: 'seller' | 'buyer' | 'admin'
+  role: 'seller' | 'buyer'
   phoneNumber: string
   password: string
   name: UserName

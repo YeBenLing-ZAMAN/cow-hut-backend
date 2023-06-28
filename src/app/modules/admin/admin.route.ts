@@ -27,6 +27,7 @@ router.get(
 router.patch(
   '/my-profile',
   auth(ENUM_USER_ROLE.ADMIN),
+  requestValidation.validateRequest(AdminValidation.AdminProfileZodSchema),
   AdminController.updateAdminProfile
 )
 

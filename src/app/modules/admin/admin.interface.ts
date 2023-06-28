@@ -8,7 +8,7 @@ export type UserName = {
 export type IAdmin = {
   _id: string
   phoneNumber: string
-  role: string
+  role: 'admin'
   name: UserName //embedded object
   password: string
   address: string
