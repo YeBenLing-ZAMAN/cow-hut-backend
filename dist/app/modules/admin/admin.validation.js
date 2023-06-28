@@ -1,11 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserValidation = void 0;
+exports.AdminValidation = void 0;
 const zod_1 = require("zod");
-const user_constants_1 = require("./user.constants");
-const createUserZodSchema = zod_1.z.object({
+const admin_constants_1 = require("./admin.constants");
+const createAdminZodSchema = zod_1.z.object({
     body: zod_1.z.object({
-        password: zod_1.z.string().optional(),
         name: zod_1.z.object({
             firstName: zod_1.z.string({
                 required_error: 'First name is required',
@@ -14,26 +13,28 @@ const createUserZodSchema = zod_1.z.object({
                 required_error: 'Last name is required',
             }),
         }),
-        role: zod_1.z.enum([...user_constants_1.role], {
-            required_error: 'User role is required',
+        phoneNumber: zod_1.z.string({
+            required_error: 'Phone Number is required',
         }),
-        gender: zod_1.z
-            .enum([...user_constants_1.gender], {
-            required_error: 'Gender is required',
-        })
-            .optional(),
+        password: zod_1.z.string({
+            required_error: 'password is required',
+        }),
         address: zod_1.z.string({
-            required_error: 'Address is required',
-        }),
-        budget: zod_1.z.number({
-            required_error: 'Budget  is required',
-        }),
-        income: zod_1.z.number({
-            required_error: 'Income is required',
+            required_error: 'Present address is required',
         }),
     }),
 });
-const updateUserZodSchema = zod_1.z.object({
+const loginAdminZodSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        phoneNumber: zod_1.z.string({
+            required_error: 'Phone Number is required',
+        }),
+        password: zod_1.z.string({
+            required_error: 'password is required',
+        }),
+    }),
+});
+const AdminProfileZodSchema = zod_1.z.object({
     body: zod_1.z.object({
         password: zod_1.z.string().optional(),
         name: zod_1.z
@@ -51,13 +52,8 @@ const updateUserZodSchema = zod_1.z.object({
         })
             .optional(),
         role: zod_1.z
-            .enum([...user_constants_1.role], {
+            .enum([...admin_constants_1.role], {
             required_error: 'User role is required',
-        })
-            .optional(),
-        gender: zod_1.z
-            .enum([...user_constants_1.gender], {
-            required_error: 'Gender is required',
         })
             .optional(),
         address: zod_1.z
@@ -77,7 +73,8 @@ const updateUserZodSchema = zod_1.z.object({
             .optional(),
     }),
 });
-exports.UserValidation = {
-    createUserZodSchema,
-    updateUserZodSchema,
+exports.AdminValidation = {
+    createAdminZodSchema,
+    loginAdminZodSchema,
+    AdminProfileZodSchema,
 };

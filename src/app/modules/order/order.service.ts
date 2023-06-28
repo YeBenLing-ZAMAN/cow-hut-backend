@@ -7,7 +7,6 @@ import { Order } from './order.model'
 import { User } from '../user/user.model'
 import { Cow } from '../cow/cow.model'
 import mongoose from 'mongoose'
-import { ObjectId } from 'mongodb'
 
 const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
   let newOrderData = null
@@ -137,9 +136,50 @@ const getAllOrders = async (
     //     // item.cow.seller.equals(sellerId)
     //     item.cow.seller === sellerId
     // )
+
+    /* 
     const specificSellerForOrder = result.filter(
-      item => item.cow.seller.id === requestedUser._id
-    )
+      item => item.cow.seller === requestedUser._id
+    ) */
+    const objectId = new mongoose.Types.ObjectId(requestedUser._id)
+    const specificSellerForOrder = await Order.aggregate([
+      {
+        $match: {},
+      },
+      {
+        $lookup: {
+          from: 'cows',
+          localField: 'cow',
+          foreignField: '_id',
+          as: 'cowInfo',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'buyer',
+          foreignField: '_id',
+          as: 'buyerInfo',
+        },
+      },
+      {
+        $unwind: '$buyerInfo',
+      },
+      {
+        $unwind: '$cowInfo',
+      },
+      {
+        $match: { 'cowInfo.seller': objectId },
+      },
+      {
+        $project: {
+          buyerInfo: {
+            password: 0,
+          },
+        },
+      },
+    ])
+
     const total = await specificSellerForOrder.length
     return {
       meta: {
