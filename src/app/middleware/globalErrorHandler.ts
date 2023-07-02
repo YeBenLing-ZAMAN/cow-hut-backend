@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express'
 import config from '../../config'
@@ -40,6 +41,16 @@ const globalErrorHandler: ErrorRequestHandler = (
   } else if (error instanceof ApiError) {
     statusCode = error?.statusCode
     message = error.message
+    errorMessages = error?.message
+      ? [
+          {
+            path: '',
+            message: error?.message,
+          },
+        ]
+      : []
+  } else if (error?.message?.includes('duplicate')) {
+    message = `user information isn't unique`
     errorMessages = error?.message
       ? [
           {
