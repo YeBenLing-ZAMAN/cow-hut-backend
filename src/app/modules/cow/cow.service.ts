@@ -7,6 +7,7 @@ import { IPaginationOptions } from '../../../interface/pagination'
 import { CowSearchAbleFields } from './cow.constants'
 import { paginationHelper } from '../../../helpers/paginationHelpers'
 import { SortOrder } from 'mongoose'
+import { User } from '../user/user.model'
 
 const createCow = async (payload: ICow): Promise<ICow | null> => {
   const result = await Cow.create(payload)
@@ -93,9 +94,12 @@ const getSingleCow = async (id: string): Promise<ICow | null> => {
 
 const updateCow = async (
   id: string,
-  payload: Partial<ICow>
+  payload: Partial<ICow>,
+  requestedUser: any
 ): Promise<ICow | null> => {
-  const isExist = await Cow.findById(id)
+  const isExist = await Cow.findOne({
+    $and: [{ _id: id }, { seller: requestedUser._id }],
+  })
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cow not found!')
   }
@@ -105,8 +109,15 @@ const updateCow = async (
   return result
 }
 
-const deleteCow = async (id: string): Promise<ICow | null> => {
-  const result = await Cow.findByIdAndDelete(id)
+const deleteCow = async (
+  id: string,
+  requestedUser: any
+): Promise<ICow | null> => {
+  console.log(requestedUser)
+  const result = await Cow.findOneAndDelete({
+    _id: id,
+    seller: requestedUser._id,
+  })
   if (!result) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to delete Cow')
   }
