@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ICow, ICowFilters } from './cow.interface'
 import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
@@ -7,7 +8,6 @@ import { IPaginationOptions } from '../../../interface/pagination'
 import { CowSearchAbleFields } from './cow.constants'
 import { paginationHelper } from '../../../helpers/paginationHelpers'
 import { SortOrder } from 'mongoose'
-import { User } from '../user/user.model'
 
 const createCow = async (payload: ICow): Promise<ICow | null> => {
   const result = await Cow.create(payload)
@@ -113,7 +113,6 @@ const deleteCow = async (
   id: string,
   requestedUser: any
 ): Promise<ICow | null> => {
-  console.log(requestedUser)
   const result = await Cow.findOneAndDelete({
     _id: id,
     seller: requestedUser._id,
