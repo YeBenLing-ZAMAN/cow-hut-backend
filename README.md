@@ -53,8 +53,8 @@
 
 ```javascript
  {
- "phoneNumber": "5678584533546",
- "password":"mydream"
+    "phoneNumber": "5678584533546",
+    "password":"mydream"
  }
 ```
 
