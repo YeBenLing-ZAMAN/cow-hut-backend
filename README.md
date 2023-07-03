@@ -93,7 +93,3 @@
 ### Order
 
 - https://cow-auth.onrender.comapi/v1/orders/649aaee492bcbdba29c80ddb (GET) | admin✔
-
-```
-
-```
