@@ -5,13 +5,58 @@
 ### Auth (user)
 
 - https://cow-auth.onrender.com/api/v1/auth/login (POST)✔
+
+```javascript
+{
+    "phoneNumber": "423756874524",
+    "password": "000000"
+}
+```
+
 - https://cow-auth.onrender.com/api/v1/auth/signup (POST)✔
+
+```javascript
+{
+    "password": "123456",
+    "role": "buyer",
+    "name": {
+        "firstName": "alam",
+        "lastName": "md"
+    },
+    "phoneNumber": "84563280142",
+    "address": "Comilla",
+    "budget": 0,
+    "income": 0
+}
+```
+
 - https://cow-auth.onrender.com/api/v1/auth/refresh-token (POST)✔
 
 ### Auth (admin)
 
 - https://cow-auth.onrender.com/api/v1/admins/create-admin (POST)✔
+
+```javascript
+{
+    "password": "123456",
+    "role": "admin",
+    "name": {
+        "firstName": "Mr.",
+        "lastName": "Admin"
+    },
+    "phoneNumber": "08802374638",
+    "address": "Uganda"
+}
+```
+
 - https://cow-auth.onrender.com/api/v1/admins/login (POST)✔
+
+```javascript
+ {
+ "phoneNumber": "5678584533546",
+ "password":"mydream"
+ }
+```
 
 ### User
 
@@ -48,3 +93,7 @@
 ### Order
 
 - https://cow-auth.onrender.comapi/v1/orders/649aaee492bcbdba29c80ddb (GET) | admin✔
+
+```
+
+```
