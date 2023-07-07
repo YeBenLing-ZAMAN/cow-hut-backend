@@ -9,6 +9,6 @@ const order_controllers_1 = require("./order.controllers");
 const validationRequest_1 = require("../../middleware/validationRequest");
 const order_validation_1 = require("./order.validation");
 const router = express_1.default.Router();
-router.post('/order-create', validationRequest_1.requestValidation.validateRequest(order_validation_1.OrderValidation.createOrderZodSchema), order_controllers_1.OrderController.createOrders);
+router.post('/', validationRequest_1.requestValidation.validateRequest(order_validation_1.OrderValidation.createOrderZodSchema), order_controllers_1.OrderController.createOrders);
 router.get('/', order_controllers_1.OrderController.getAllOrders);
 exports.OrderRoutes = router;

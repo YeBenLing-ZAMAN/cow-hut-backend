@@ -9,7 +9,7 @@ const cow_controllers_1 = require("./cow.controllers");
 const cow_validation_1 = require("./cow.validation");
 const validationRequest_1 = require("../../middleware/validationRequest");
 const router = express_1.default.Router();
-router.post('/cow-create', validationRequest_1.requestValidation.validateRequest(cow_validation_1.CowValidation.createCowZodSchema), cow_controllers_1.CowController.createCow);
+router.post('/', validationRequest_1.requestValidation.validateRequest(cow_validation_1.CowValidation.createCowZodSchema), cow_controllers_1.CowController.createCow);
 router.get('/', cow_controllers_1.CowController.getAllCows);
 router.get('/:id', cow_controllers_1.CowController.getSingleCow);
 router.delete('/:id', cow_controllers_1.CowController.deleteCow);
