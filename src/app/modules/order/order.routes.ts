@@ -5,7 +5,7 @@ import { OrderValidation } from './order.validation'
 const router = express.Router()
 
 router.post(
-  '/order-create',
+  '/',
   requestValidation.validateRequest(OrderValidation.createOrderZodSchema),
   OrderController.createOrders
 )

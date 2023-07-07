@@ -5,7 +5,7 @@ import { requestValidation } from '../../middleware/validationRequest'
 const router = express.Router()
 
 router.post(
-  '/cow-create',
+  '/',
   requestValidation.validateRequest(CowValidation.createCowZodSchema),
   CowController.createCow
 )
