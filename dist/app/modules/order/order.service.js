@@ -1,275 +1,196 @@
-'use strict'
-var __awaiter =
-  (this && this.__awaiter) ||
-  function (thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P
-        ? value
-        : new P(function (resolve) {
-            resolve(value)
-          })
-    }
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value))
-        } catch (e) {
-          reject(e)
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator['throw'](value))
-        } catch (e) {
-          reject(e)
-        }
-      }
-      function step(result) {
-        result.done
-          ? resolve(result.value)
-          : adopt(result.value).then(fulfilled, rejected)
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next())
-    })
-  }
-var __importDefault =
-  (this && this.__importDefault) ||
-  function (mod) {
-    return mod && mod.__esModule ? mod : { default: mod }
-  }
-Object.defineProperty(exports, '__esModule', { value: true })
-exports.OrderService = void 0
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrderService = void 0;
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const http_status_1 = __importDefault(require('http-status'))
-const ApiError_1 = __importDefault(require('../../../errors/ApiError'))
-const order_model_1 = require('./order.model')
-const user_model_1 = require('../user/user.model')
-const cow_model_1 = require('../cow/cow.model')
-const mongoose_1 = __importDefault(require('mongoose'))
-const createOrder = payload =>
-  __awaiter(void 0, void 0, void 0, function* () {
-    let newOrderData = null
-    const { buyer, cow } = payload
-    const budgetAmount = yield user_model_1.User.findById(buyer).select(
-      'budget'
-    )
-    const cowDetails = yield cow_model_1.Cow.findById(cow).select(
-      'price seller label'
-    )
+const http_status_1 = __importDefault(require("http-status"));
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
+const order_model_1 = require("./order.model");
+const user_model_1 = require("../user/user.model");
+const cow_model_1 = require("../cow/cow.model");
+const mongoose_1 = __importDefault(require("mongoose"));
+const createOrder = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    let newOrderData = null;
+    const { buyer, cow } = payload;
+    const budgetAmount = yield user_model_1.User.findById(buyer).select('budget');
+    const cowDetails = yield cow_model_1.Cow.findById(cow).select('price seller label');
     if (!budgetAmount || !cowDetails) {
-      throw new ApiError_1.default(
-        http_status_1.default.NOT_FOUND,
-        `something went wrong, buyer or cow not found !`
-      )
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, `something went wrong, buyer or cow not found !`);
     }
     if (cowDetails.label !== 'for sale') {
-      throw new ApiError_1.default(
-        http_status_1.default.NOT_FOUND,
-        `This cow is already sold out !`
-      )
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, `This cow is already sold out !`);
     }
-    if (
-      (budgetAmount === null || budgetAmount === void 0
-        ? void 0
-        : budgetAmount.budget) < cowDetails.price
-    ) {
-      throw new ApiError_1.default(
-        http_status_1.default.BAD_REQUEST,
-        `haven't enough money to purchase`
-      )
+    if ((budgetAmount === null || budgetAmount === void 0 ? void 0 : budgetAmount.budget) < cowDetails.price) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, `haven't enough money to purchase`);
     }
-    const session = yield mongoose_1.default.startSession()
+    const session = yield mongoose_1.default.startSession();
     try {
-      session.startTransaction()
-      const buyerUpdate = yield user_model_1.User.findOneAndUpdate(
-        { _id: buyer },
-        { budget: budgetAmount.budget - cowDetails.price },
-        {
-          session,
+        session.startTransaction();
+        const buyerUpdate = yield user_model_1.User.findOneAndUpdate({ _id: buyer }, { budget: budgetAmount.budget - cowDetails.price }, {
+            session,
+        });
+        if (!buyerUpdate) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to buyer Update');
         }
-      )
-      if (!buyerUpdate) {
-        throw new ApiError_1.default(
-          http_status_1.default.BAD_REQUEST,
-          'Failed to buyer Update'
-        )
-      }
-      const sellerInfo = yield user_model_1.User.findById(
-        cowDetails.seller
-      ).session(session)
-      if (!sellerInfo) {
-        throw new ApiError_1.default(
-          http_status_1.default.BAD_REQUEST,
-          'Failed to find seller information'
-        )
-      }
-      const SellerUpdate = yield user_model_1.User.findOneAndUpdate(
-        { _id: cowDetails.seller },
-        { income: sellerInfo.income + cowDetails.price },
-        {
-          session,
+        const sellerInfo = yield user_model_1.User.findById(cowDetails.seller).session(session);
+        if (!sellerInfo) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to find seller information');
         }
-      )
-      if (!SellerUpdate) {
-        throw new ApiError_1.default(
-          http_status_1.default.BAD_REQUEST,
-          'Failed to Seller Update'
-        )
-      }
-      const updateCow = yield cow_model_1.Cow.findOneAndUpdate(
-        { _id: cow },
-        { label: 'sold out' },
-        {
-          session,
+        const SellerUpdate = yield user_model_1.User.findOneAndUpdate({ _id: cowDetails.seller }, { income: sellerInfo.income + cowDetails.price }, {
+            session,
+        });
+        if (!SellerUpdate) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to Seller Update');
         }
-      )
-      if (!updateCow) {
-        throw new ApiError_1.default(
-          http_status_1.default.BAD_REQUEST,
-          'Failed to update Cow'
-        )
-      }
-      const order = yield order_model_1.Order.create([payload], {
-        session: session,
-      })
-      if (!order.length) {
-        throw new ApiError_1.default(
-          http_status_1.default.BAD_REQUEST,
-          'Failed to create order list'
-        )
-      }
-      newOrderData = order[0]
-      yield session.commitTransaction()
-      yield session.endSession()
-    } catch (error) {
-      yield session.abortTransaction()
-      yield session.endSession()
-      throw error
+        const updateCow = yield cow_model_1.Cow.findOneAndUpdate({ _id: cow }, { label: 'sold out' }, {
+            session,
+        });
+        if (!updateCow) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to update Cow');
+        }
+        const order = yield order_model_1.Order.create([payload], { session: session });
+        if (!order.length) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create order list');
+        }
+        newOrderData = order[0];
+        yield session.commitTransaction();
+        yield session.endSession();
     }
-    return newOrderData
-  })
-const getAllOrders = requestedUser =>
-  __awaiter(void 0, void 0, void 0, function* () {
+    catch (error) {
+        yield session.abortTransaction();
+        yield session.endSession();
+        throw error;
+    }
+    return newOrderData;
+});
+const getAllOrders = (requestedUser) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.Order.find()
-      .sort()
-      .populate({
+        .sort()
+        .populate({
         path: 'cow',
         populate: {
-          path: 'seller',
-          select: '-password',
+            path: 'seller',
+            select: '-password',
         },
-      })
-      .populate({
+    })
+        .populate({
         path: 'buyer',
         select: '-password',
-      })
-    const total = yield order_model_1.Order.countDocuments()
+    });
+    const total = yield order_model_1.Order.countDocuments();
     if (requestedUser.role === 'admin') {
-      return {
-        meta: {
-          page: 1,
-          limit: 2,
-          total,
-        },
-        data: result,
-      }
-    } else if (requestedUser.role === 'buyer') {
-      const specificBuyerOrder = result.filter(
-        item => item.buyer.id === requestedUser._id
-      )
-      const total = yield specificBuyerOrder.length
-      return {
-        meta: {
-          page: 1,
-          limit: 2,
-          total,
-        },
-        data: specificBuyerOrder,
-      }
-    } else {
-      // const specificSellerForOrder = result.filter(
-      //   item =>
-      //     // item.cow.seller.equals(sellerId)
-      //     item.cow.seller === sellerId
-      // )
-      /*
+        return {
+            meta: {
+                page: 1,
+                limit: 2,
+                total,
+            },
+            data: result,
+        };
+    }
+    else if (requestedUser.role === 'buyer') {
+        const specificBuyerOrder = result.filter(item => item.buyer.id === requestedUser._id);
+        const total = yield specificBuyerOrder.length;
+        return {
+            meta: {
+                page: 1,
+                limit: 2,
+                total,
+            },
+            data: specificBuyerOrder,
+        };
+    }
+    else {
+        // const specificSellerForOrder = result.filter(
+        //   item =>
+        //     // item.cow.seller.equals(sellerId)
+        //     item.cow.seller === sellerId
+        // )
+        /*
         const specificSellerForOrder = result.filter(
           item => item.cow.seller === requestedUser._id
         ) */
-      const objectId = new mongoose_1.default.Types.ObjectId(requestedUser._id)
-      const specificSellerForOrder = yield order_model_1.Order.aggregate([
-        {
-          $match: {},
-        },
-        {
-          $lookup: {
-            from: 'cows',
-            localField: 'cow',
-            foreignField: '_id',
-            as: 'cowInfo',
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            localField: 'buyer',
-            foreignField: '_id',
-            as: 'buyerInfo',
-          },
-        },
-        {
-          $unwind: '$buyerInfo',
-        },
-        {
-          $unwind: '$cowInfo',
-        },
-        {
-          $match: { 'cowInfo.seller': objectId },
-        },
-        {
-          $project: {
-            buyerInfo: {
-              password: 0,
+        const objectId = new mongoose_1.default.Types.ObjectId(requestedUser._id);
+        const specificSellerForOrder = yield order_model_1.Order.aggregate([
+            {
+                $match: {},
             },
-          },
-        },
-      ])
-      const total = yield specificSellerForOrder.length
-      return {
-        meta: {
-          page: 1,
-          limit: 2,
-          total,
-        },
-        data: specificSellerForOrder,
-      }
+            {
+                $lookup: {
+                    from: 'cows',
+                    localField: 'cow',
+                    foreignField: '_id',
+                    as: 'cowInfo',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'buyer',
+                    foreignField: '_id',
+                    as: 'buyerInfo',
+                },
+            },
+            {
+                $unwind: '$buyerInfo',
+            },
+            {
+                $unwind: '$cowInfo',
+            },
+            {
+                $match: { 'cowInfo.seller': objectId },
+            },
+            {
+                $project: {
+                    buyerInfo: {
+                        password: 0,
+                    },
+                },
+            },
+        ]);
+        const total = yield specificSellerForOrder.length;
+        return {
+            meta: {
+                page: 1,
+                limit: 2,
+                total,
+            },
+            data: specificSellerForOrder,
+        };
     }
-  })
-const getOrder = id =>
-  __awaiter(void 0, void 0, void 0, function* () {
+});
+const getOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.Order.findById(id)
-      .sort()
-      .populate({
+        .sort()
+        .populate({
         path: 'cow',
         populate: {
-          path: 'seller',
-          select: '-password',
+            path: 'seller',
+            select: '-password',
         },
-      })
-      .populate({
+    })
+        .populate({
         path: 'buyer',
         select: '-password',
-      })
+    });
     if (!result) {
-      throw new ApiError_1.default(
-        http_status_1.default.NOT_FOUND,
-        'Order not found!'
-      )
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Order not found!');
     }
-    return result
-  })
+    return result;
+});
 exports.OrderService = {
-  createOrder,
-  getAllOrders,
-  getOrder,
-}
+    createOrder,
+    getAllOrders,
+    getOrder,
+};

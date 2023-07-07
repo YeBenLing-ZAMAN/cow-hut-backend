@@ -7,7 +7,7 @@ import { ENUM_USER_ROLE } from '../../enums/user'
 const router = express.Router()
 
 router.post(
-  '/order-create',
+  '/',
   auth(ENUM_USER_ROLE.BUYER),
   requestValidation.validateRequest(OrderValidation.createOrderZodSchema),
   OrderController.createOrders

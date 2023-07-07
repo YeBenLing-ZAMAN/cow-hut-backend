@@ -7,7 +7,7 @@ import { ENUM_USER_ROLE } from '../../enums/user'
 const router = express.Router()
 
 router.post(
-  '/cow-create',
+  '/',
   auth(ENUM_USER_ROLE.SELLER),
   requestValidation.validateRequest(CowValidation.createCowZodSchema),
   CowController.createCow

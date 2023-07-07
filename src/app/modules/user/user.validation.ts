@@ -3,7 +3,7 @@ import { gender, role } from './user.constants'
 
 const createUserZodSchema = z.object({
   body: z.object({
-    password: z.string().optional(),
+    password: z.string(),
     name: z.object({
       firstName: z.string({
         required_error: 'First name is required',
